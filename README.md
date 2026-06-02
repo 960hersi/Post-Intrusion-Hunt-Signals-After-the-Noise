@@ -9,7 +9,7 @@ Primary Host: azwks-phtg-01
 Primary Account: vmadminusername
 Objective: Reconstruct post-access operator activity after the initial break-in was already established.
 
-1. Executive Summary
+**1. Executive Summary**
 
 This hunt investigated post-intrusion activity on azwks-phtg-01 after the operator gained access using credential reuse. The investigation confirmed successful lateral movement from 10.0.0.152 to azwks-phtg-01 using vmadminusername, followed by operator staging, PowerShell execution, HealthCloud-themed masquerading, persistence setup, Defender tampering, web-based beaconing, and LSASS memory access.
 
@@ -23,7 +23,7 @@ The most serious late-stage activity was credential access behavior against lsas
 
 This report uses the 29-flag hunt structure provided for the investigation, including lateral movement, persistence, beaconing, Defender tampering, and LSASS access questions.
 
-2. Scope and Data Sources
+**2. Scope and Data Sources**
 In Scope
 Item	Value
 Main host	azwks-phtg-01
@@ -39,7 +39,8 @@ DeviceFileEvents	Startup artifacts and staged files
 DeviceRegistryEvents	Run keys, registry persistence, HKLM modifications
 DeviceNetworkEvents	Beaconing and outbound communication
 DeviceEvents	Defender events, PowerShellCommand telemetry, LSASS API events
-3. High-Level Attack Narrative
+
+**3. High-Level Attack Narrative**
 
 The operator did not appear to brute force access. The successful access was better explained as credential reuse, aligning with MITRE ATT&CK Valid Accounts behavior, where adversaries use legitimate credentials to access systems and blend into normal activity.
 
@@ -49,7 +50,7 @@ Once on the host, the operator used PowerShell heavily for script execution and 
 
 The operator then staged tooling in a HealthCloud-themed path, hid artifacts with attrib.exe, masqueraded PHTGHealthCloudSvc.exe as bitsadmin.exe, configured Run key and Startup folder persistence, modified Defender exclusions, used web-based C2 endpoints, and finally accessed LSASS memory.
 
-4. Timeline of Key Activity
+**4. Timeline of Key Activity**
 Time UTC	Activity
 09:48:40	Lateral movement to azwks-phtg-01 using vmadminusername
 After 09:48	First operator PowerShell script launched from C:\Users\vmAdminUsername\Documents\PHTG\_.ps1
@@ -62,7 +63,9 @@ After 09:48	First operator PowerShell script launched from C:\Users\vmAdminUsern
 10:14	PowerShell accessed lsass.exe under vmadminusername
 10:15+	Additional HealthCloud scripts and beaconing observed
 Later window	Startup persistence fired twice
-5. Detailed Findings
+
+**5. Detailed Findings**
+
 Finding 1 — Initial Access Was Credential Reuse
 
 Flag Answer:
@@ -353,7 +356,8 @@ Opening a full-access handle was not enough to prove dumping. The next confirmin
 
 This confirmed that the operator actually read memory from LSASS, strengthening the credential-access finding.
 
-MITRE ATT&CK Mapping
+**MITRE ATT&CK Mapping**
+
 Tactic	Technique	Evidence From Hunt
 Initial Access / Defense Evasion / Persistence	T1078 Valid Accounts	Credential reuse with vmadminusername
 Lateral Movement	T1021 Remote Services	Successful remote logon to azwks-phtg-01
@@ -365,7 +369,7 @@ Defense Evasion	T1112 Modify Registry	HKLM event source registration and registr
 Command and Control	T1071.001 Web Protocols	HTTPS beaconing to HealthCloud-themed domains
 Command and Control / Tool Transfer	T1105 Ingress Tool Transfer	Outbound call followed by local SvcExe execution
 
-Conclusion
+**Conclusion**
 
 The hunt confirmed that the operator used credential reuse to access the environment, moved laterally to azwks-phtg-01, and conducted a full post-access sequence. The activity included staging, masquerading, persistence, beaconing, Defender tampering, and credential access.
 
