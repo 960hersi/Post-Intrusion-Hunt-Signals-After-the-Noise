@@ -53,14 +53,23 @@ The operator then staged tooling in a HealthCloud-themed path, hid artifacts wit
 **4. Timeline of Key Activity**
 Time UTC	Activity
 09:48:40	Lateral movement to azwks-phtg-01 using vmadminusername
-After 09:48	First operator PowerShell script launched from C:\Users\vmAdminUsername\Documents\PHTG\_.ps1
+
+09:48	First operator PowerShell script launched from C:\Users\vmAdminUsername\Documents\PHTG\_.ps1
+
 10:11	Temporary Defender exclusion applied for C:\Users\vmAdminUsername\Documents\PHTG
+
 10:12	HealthCloud staging and C2 download/execution sequence observed
+
 10:12	Defender exclusion added for C:\ProgramData\PHTG\HealthCloud\Cache
+
 10:13	Startup folder persistence artifact PHTG HealthCloud.lnk created/reported
+
 10:14	amsi_probe.ps1 executed to test AMSI/PowerShell scanning
+
 10:14	Defender process exclusion added for PHTGHealthCloudSvc.exe
+
 10:14	PowerShell accessed lsass.exe under vmadminusername
+
 10:15+	Additional HealthCloud scripts and beaconing observed
 Later window	Startup persistence fired twice
 
@@ -84,6 +93,9 @@ DeviceLogonEvents showed successful lateral movement to azwks-phtg-01 using vmad
 
 This is consistent with MITRE T1021 Remote Services, where an operator authenticates to a remote system using valid credentials.
 
+<img width="1504" height="372" alt="Screenshot 2026-06-08 191425" src="https://github.com/user-attachments/assets/647c6793-9fad-4a7f-9415-81cdc730ffa3" />
+
+
 Finding 3 — No Confirmed Onward Pivot
 
 Flag Answer:
@@ -103,6 +115,9 @@ C:\Users\vmAdminUsername\Documents\PHTG\_.ps1
 The first script launched under the operator’s own account context was _.ps1 from the user’s Documents path.
 
 This script became important later because it temporarily modified Defender exclusions before removing them.
+
+<img width="1498" height="115" alt="image" src="https://github.com/user-attachments/assets/d2e68083-bbe1-48a8-a339-96a6dba43e75" />
+
 
 Finding 5 — PowerShell Concealment Flags
 
@@ -134,6 +149,9 @@ The operator used attrib.exe with hidden/system-style flags against HealthCloud 
 
 This maps to MITRE Hide Artifacts behavior, where adversaries hide files, directories, or other artifacts to reduce visibility.
 
+<img width="1540" height="142" alt="image" src="https://github.com/user-attachments/assets/4b52c121-57ae-44e1-bdd1-27da56fad407" />
+
+
 Finding 8 — Masqueraded Operator Binary
 
 Flag Answer:
@@ -144,6 +162,9 @@ The suspicious binary was PHTGHealthCloudSvc.exe, but its original filename meta
 
 This matches MITRE T1036.005 Match Legitimate Name or Location, where adversaries make malicious files appear legitimate by matching names, locations, or metadata associated with trusted software.
 
+<img width="1543" height="329" alt="image" src="https://github.com/user-attachments/assets/c7659b2f-5280-449d-92bc-ebc394fc773c" />
+
+
 Finding 9 — Registry Modification Volume
 
 Flag Answer:
@@ -151,8 +172,6 @@ Flag Answer:
 280
 
 There were 280 registry modification events under vmadminusername on azwks-phtg-01 after lateral movement.
-
-Most of this was noise, including Desktop theme, MUI cache, and COM activity. The useful work was filtering this registry churn to isolate the persistence-relevant key.
 
 Finding 10 — Run Key Persistence Path
 
@@ -163,6 +182,7 @@ HKEY_CURRENT_USER\S-1-5-21-1521579525-3948531162-803360686-500\SOFTWARE\Microsof
 The operator used a user Run key for persistence.
 
 MITRE T1547.001 Registry Run Keys / Startup Folder describes how entries in Run keys or Startup folders cause programs to execute when a user logs in.
+<img width="1495" height="328" alt="image" src="https://github.com/user-attachments/assets/7c835720-d20d-4279-aac3-41bea7d26ed9" />
 
 Finding 11 — Suspicious Run Key Value
 
@@ -173,6 +193,7 @@ PHTGHealthCloudTray
 The suspicious Run key value was PHTGHealthCloudTray.
 
 Edge auto-launch entries were legitimate, but this value pointed to the operator’s HealthCloud-themed PowerShell persistence.
+<img width="1515" height="262" alt="image" src="https://github.com/user-attachments/assets/7b9a55aa-cf8c-4d4a-b23f-a5898220a363" />
 
 Finding 12 — Run Key Persistence Command
 
@@ -183,6 +204,7 @@ powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\
 This command was configured to run at user logon.
 
 It used PowerShell with hidden execution and policy bypass flags to execute HealthCloudTray.ps1 from the HealthCloud staging directory.
+<img width="1511" height="302" alt="image" src="https://github.com/user-attachments/assets/82ee9789-18dd-4b5a-8053-f09c5b1eebbe" />
 
 Finding 13 — Startup Folder Persistence
 
@@ -193,6 +215,7 @@ PHTG HealthCloud.lnk
 The operator dropped a Startup folder shortcut named PHTG HealthCloud.lnk.
 
 This was the second persistence mechanism, separate from the Run key. Startup folder persistence is also covered by MITRE T1547.001.
+<img width="1512" height="327" alt="image" src="https://github.com/user-attachments/assets/c5a70ef4-7040-4b43-81c7-daf68734bcbf" />
 
 Finding 14 — Custom Event Log Source
 
@@ -205,6 +228,7 @@ The operator registered a custom Application event log source under HKLM.
 This was not classic persistence. Instead, it enabled the operator’s tooling to write trusted-looking entries into the Windows Application log.
 
 This also maps to MITRE T1112 Modify Registry, where adversaries modify Registry keys to support execution, hiding, or other operational goals.
+<img width="1516" height="312" alt="image" src="https://github.com/user-attachments/assets/40f16f9b-eb83-41c7-8e55-20d67fed461b" />
 
 Finding 15 — Healthcheck Loop Count
 
@@ -225,6 +249,7 @@ The beacons contacted https://status.health-cloud.cc/api/checkin?flag=FLAG-09&de
 Two encoded PowerShell beacons contacted endpoints under health-cloud.cc.
 
 This maps to MITRE T1071.001 Web Protocols, where adversaries use HTTP or HTTPS to blend command-and-control traffic into normal web traffic.
+<img width="1515" height="416" alt="image" src="https://github.com/user-attachments/assets/ac637d49-a5e8-4ac3-83dc-28a28bab6641" />
 
 Finding 17 — Parallel Beacon Channels
 
@@ -255,6 +280,7 @@ status.health-cloud.cc, updates.health-cloud.cc
 PowerShell reached two domains during post-access activity: status.health-cloud.cc and updates.health-cloud.cc.
 
 Both followed the same HealthCloud-themed domain pattern and supported the broader C2/beaconing behavior.
+<img width="1520" height="242" alt="image" src="https://github.com/user-attachments/assets/5b01c264-6a36-4da7-9e93-4ae85ced4e68" />
 
 Finding 20 — AMSI Probe
 
@@ -265,6 +291,7 @@ amsi_probe.ps1 tests if AMSI will catch the attacker's PowerShell payloads.
 The operator ran amsi_probe.ps1 after outbound communication succeeded.
 
 The script name and context suggest the operator was checking whether AMSI/Defender would detect or block upcoming PowerShell payloads. This supports a Defense Evasion interpretation under MITRE T1562.001 Disable or Modify Tools, which includes modifying security tools to avoid detection.
+<img width="1521" height="142" alt="image" src="https://github.com/user-attachments/assets/32f3171f-1bc0-4990-9d6b-b017f114cd6a" />
 
 Finding 21 — Lineage Break Through cmd.exe
 
@@ -275,6 +302,7 @@ cmd.exe launched powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\Pro
 The operator used cmd.exe as an intermediary launcher twice.
 
 This made process lineage less direct and complicated simple parent-child process analysis.
+<img width="1560" height="457" alt="image" src="https://github.com/user-attachments/assets/43a51749-265c-4469-8e4d-a1a2127b5ddc" />
 
 Finding 22 — Defender Tampering
 
@@ -335,6 +363,7 @@ vmadminusername, powershell.exe
 Most LSASS access events were baseline activity from system or security processes. The anomalous one was PowerShell under vmadminusername.
 
 This stood out because a normal user-context PowerShell process accessing LSASS is suspicious.
+<img width="1523" height="157" alt="image" src="https://github.com/user-attachments/assets/1bad2de8-ea09-4b4a-acb6-66ef36e7ade6" />
 
 Finding 28 — Full-Access LSASS Handle
 
@@ -345,6 +374,7 @@ Flag Answer:
 The operator’s LSASS access showed two DesiredAccess values. The high-risk value was 2047999.
 
 This represented escalation from a lower access attempt to full-access process access. Full or broad access to LSASS is consistent with credential dumping intent. MITRE T1003.001 LSASS Memory describes adversaries attempting to access credential material stored in LSASS process memory.
+<img width="1514" height="422" alt="image" src="https://github.com/user-attachments/assets/dfe6102f-8afe-4e86-b40d-6de4f64f1fc3" />
 
 Finding 29 — Credential Dump Confirmation
 
@@ -355,6 +385,7 @@ ReadProcessMemoryApiCall
 Opening a full-access handle was not enough to prove dumping. The next confirming ActionType was ReadProcessMemoryApiCall.
 
 This confirmed that the operator actually read memory from LSASS, strengthening the credential-access finding.
+<img width="1518" height="270" alt="image" src="https://github.com/user-attachments/assets/8ab0ca98-5d1e-41f1-a777-a90e31f0a34b" />
 
 **MITRE ATT&CK Mapping**
 
