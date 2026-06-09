@@ -266,7 +266,7 @@ This recurring pattern showed beacon-style activity disguised as HealthCloud ser
 **Finding 16 — Encoded PowerShell Beacon Endpoints**
 Flag Answer:
 
-The beacons contacted https://status.health-cloud.cc/api/checkin?flag=FLAG-09&device=azwks-phtg-01 and then https://status.health-cloud.cc/api/status?flag=FLAG-10&device=azwks-phtg-01, both under health-cloud.cc.
+The beacons contacted https://status.health-cloud.cc/api/checkin?flag=FLAG-09&device=azwks-phtg-01/ and then https://status.health-cloud.cc/api/status?flag=FLAG-10&device=azwks-phtg-01/, both under health-cloud.cc.
 
 Two encoded PowerShell beacons contacted endpoints under health-cloud.cc.
 
