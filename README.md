@@ -2,11 +2,17 @@
 Threat Hunt Report:
 
 Hunt: Signals After the Noise 2 / Hunt 06
+
 Platform: Microsoft Sentinel / Microsoft Defender XDR
+
 Investigation Window: 2025-12-13 09:00 UTC – 2025-12-13 18:00 UTC
+
 Anchor Time: 2025-12-13 09:48:40 UTC
+
 Primary Host: azwks-phtg-01
+
 Primary Account: vmadminusername
+
 Objective: Reconstruct post-access operator activity after the initial break-in was already established.
 
 **1. Executive Summary**
